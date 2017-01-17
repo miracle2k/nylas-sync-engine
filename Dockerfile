@@ -32,6 +32,7 @@ RUN apt-get update && apt-get -y install python-software-properties\
 		   unzip \
     && apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN curl -L -o /usr/local/bin/envplate https://github.com/kreuzwerker/envplate/releases/download/1.0.0-RC1/ep-linux && chmod +x /usr/local/bin/envplate
 
 RUN mkdir -p /tmp/build
 WORKDIR /tmp/build
@@ -57,6 +58,7 @@ ENV LC_ALL=en_US.UTF-8
 ENV LANF=en_US.UTF-8
 ENV TAG=17.1.6
 RUN curl -L -O https://github.com/nylas/sync-engine/archive/${TAG}.zip && unzip ${TAG}.zip && rm ${TAG}.zip && mv sync-engine-${TAG} sync-engine
+
 WORKDIR /opt/sync-engine
 RUN find . -name \*.pyc -delete &&\
     pip install -r requirements.txt && pip install -e . && \
@@ -64,6 +66,7 @@ RUN find . -name \*.pyc -delete &&\
     mkdir -p /etc/inboxapp
 ADD config.json /etc/inboxapp/config-env.json
 ADD secrets.yml /etc/inboxapp/secrets-env.yml
+ADD env-setup.sh /opt
 RUN chmod 0644 /etc/inboxapp/config-env.json && chmod 0600 /etc/inboxapp/secrets-env.yml && chown -R inbox:inbox /etc/inboxapp
 RUN apt-get -y autoremove && apt-get clean &&\
     mkdir -p /var/lib/inboxapp/parts && mkdir -p /var/log/inboxapp && chown inbox:inbox /var/log/inboxapp &&\
